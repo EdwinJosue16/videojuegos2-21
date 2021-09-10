@@ -46,7 +46,7 @@ public class Ball : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D other)
     {
-        var contactPoint = other.contacts[0];
+        var contactPoint = other.GetContact(0);
         Bounce(contactPoint);
     }
     void Bounce(ContactPoint2D contact)
