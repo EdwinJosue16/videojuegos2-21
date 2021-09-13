@@ -24,4 +24,6 @@ public class Pad : MonoBehaviour
         position.x = Mathf.Clamp(paddlePos, minX, maxX);
         transform.position = position;
     }
+
+    
 }
