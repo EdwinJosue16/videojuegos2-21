@@ -277,6 +277,11 @@ MonoBehaviour:
   animator: {fileID: 360471624}
   direction: {x: 0, y: 0, z: 0}
   groundLength: 0.55
+  jumpSpeed: 6
+  gravity: 1
+  fallMultiplier: 5
+  linearDrag: 4
+  jumpPressed: 0
 --- !u!114 &360471623
 MonoBehaviour:
   m_ObjectHideFlags: 0
