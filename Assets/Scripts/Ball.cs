@@ -37,6 +37,7 @@ public class Ball : MonoBehaviour
     }
     void LaunchOnClick(){
         if(Input.GetMouseButtonDown(0)){
+            GameManager.instance.StartGame();
             playing = true;
             _ballRigidBody.velocity = new Vector2(xVelocity,yVelocity);
         }
@@ -101,11 +102,13 @@ public class Ball : MonoBehaviour
     void OnHorizontalCollision(){
         yVelocity *= -1;
         _ballRigidBody.velocity = new Vector2(xVelocity,yVelocity);
+        AudioManager.instance.PlaySfx("WallHit");
     }
 
     void OnVerticalCollision(){
         xVelocity *= -1;
         _ballRigidBody.velocity = new Vector2(xVelocity, yVelocity);
+        AudioManager.instance.PlaySfx("WallHit");
     }
     
 }
