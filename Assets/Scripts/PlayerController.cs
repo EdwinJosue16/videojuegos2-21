@@ -21,9 +21,18 @@ public class PlayerController : MonoBehaviour
     public float gravity = 1f;
     public float fallMultiplier = 5f;
     public float linearDrag;
+
+    public float jumpDelay = 0.25f;
+    public float jumpTimer;
     
+    public float directionForce = 0;
+
     [Header("Buttons Pressed")]
     public bool jumpPressed = false;
+
+    public Vector3 colliderOffset;
+
+    
     
 
 
@@ -35,13 +44,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-      if(Input.GetKey(KeyCode.D)){
-          physics.AddForce(new Vector2(forceX * Time.deltaTime, 0));
+      if(directionForce > 0){
           animator.SetBool("isPlayerRunning", true);  
           direction = Vector3.zero;
       }
-      else if(Input.GetKey(KeyCode.A)){
-          physics.AddForce(new Vector2(-1* forceX * Time.deltaTime, 0));
+      else if(directionForce < 0){
           animator.SetBool("isPlayerRunning", true);
           direction = new Vector3(0,180,0);
       }
@@ -49,13 +56,18 @@ public class PlayerController : MonoBehaviour
           animator.SetBool("isPlayerRunning", false);
       }
 
-      Quaternion rotationTarget = Quaternion.Euler(direction);
-      transform.rotation = Quaternion.Lerp(transform.rotation, rotationTarget, Time.deltaTime * 4);
+      
     }
 
     void FixedUpdate(){
-        jumping = !Physics2D.Raycast(transform.position, Vector2.down, groundLength,groundLayer);
+        Quaternion rotationTarget = Quaternion.Euler(direction);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotationTarget, Time.deltaTime * 4);
+        jumping = !Physics2D.Raycast(transform.position+colliderOffset, Vector2.down, groundLength,groundLayer) || !Physics2D.Raycast(transform.position-colliderOffset, Vector2.down, groundLength,groundLayer);
+        physics.AddForce(new Vector2(forceX * Time.deltaTime * directionForce, 0));
         ModifyPlayerPhysics();
+        if(jumpTimer > Time.time && !jumping){
+            Jump();
+        }
     }
 
     void ModifyPlayerPhysics(){
@@ -76,14 +88,22 @@ public class PlayerController : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context){
         if(context.performed){
-            if(!jumping ){
-                Jump();
-            }
-           jumpPressed = true;
+            jumpTimer = Time.time + jumpDelay; // Valor en el futuro
+            jumpPressed = true;
         }
         else if(context.canceled){
             jumpPressed = false;
         }
+    }
+
+    public void Run(InputAction.CallbackContext context){
+        if(context.performed){
+            directionForce = context.ReadValue<float>();
+        }
+        else if(context.canceled){
+            directionForce = 0;
+        }
+        Debug.Log("Context Run: " + directionForce);
     }
 
     public void Jump(){
@@ -93,7 +113,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnDrawGizmos(){
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundLength);
+        Gizmos.DrawLine(transform.position+colliderOffset, transform.position + colliderOffset + Vector3.down * groundLength);
+        Gizmos.DrawLine(transform.position-colliderOffset, transform.position - colliderOffset + Vector3.down * groundLength);
     }
 
 }
